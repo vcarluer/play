@@ -1,5 +1,3 @@
-import time
-import multiprocessing
 import os.path
 from ffmpy import FFmpeg
 
@@ -12,8 +10,10 @@ def transcode(source):
     ff=FFmpeg(inputs={source: None}, outputs={targetFull: '-c:a aac -c:v copy -y -loglevel error' })
     # ff.cmd
     ff.run()
+    return targetFull
 
-def transcode_agent(queue):
+def transcode_agent(queue, playQueue):
+    print('Transcode agent starting')
     doLoop = True
     while doLoop:
         if not queue.empty():
@@ -23,4 +23,5 @@ def transcode_agent(queue):
                 doLoop = False
             else:
                 print('Transcode agent transcode ' + source)
-                transcode(source)
+                target = transcode(source)
+                playQueue.put('transcoded:' + target)

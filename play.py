@@ -1,9 +1,8 @@
 from playcoder.playcoder import transcode_agent
+from playscanner.playscanner import scan_agent
 import multiprocessing
-import time
 import signal
 
-testSource = '/var/local/localms/movies/Sample (2017)/test.mkv'
 
 def main():
     print('Running play')
@@ -12,14 +11,28 @@ def main():
     signal.signal(signal.SIGINT, original_sigint_handler)
     m = multiprocessing.Manager()
     try:
+        playQueue = m.Queue()
+        print('play transcode')
         transcodeQueue = m.Queue()
-        transcodeAgent = pool.apply_async(transcode_agent, (transcodeQueue,))
-        print('Starting transcoder agent')
-        transcodeQueue.put(testSource)
-        transcodeAgent.get()
+        transcodeAgent = pool.apply_async(transcode_agent, (transcodeQueue, playQueue,))
+        print('play scan')
+        scanQueue = m.Queue()
+        scanAgent = pool.apply_async(scan_agent, (scanQueue, playQueue,))
+        # srt scanner
+        # vtt encoder
+        # media move (on transcoded + vtt: file tag?)
+        print('play loop')
+        doLoop = True
+        while doLoop:
+            if not playQueue.empty():
+                message = playQueue.get()
+                print('Play server message received: ' + message)
+                msg = message.split(':')
+                if msg[0] == 'scan_video':
+                    transcodeQueue.put(msg[1])
+
     except KeyboardInterrupt:
         print("Shutdown requested...exiting")
-        transcodeQueue.put('exit')
         pool.terminate()
     else:
         print("Normal termination")
