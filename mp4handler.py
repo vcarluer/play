@@ -34,7 +34,7 @@ class Mp4EventHandler(PatternMatchingEventHandler):
                 pass
 
     def getsrt(self, source):
-        region.configure('dogpile.cache.dbm', arguments={'filename': 'cachefilesrt.dbm'})
+        region.configure('dogpile.cache.dbm', arguments={'filename': '/var/local/localms/cachefilesrt.dbm'})
         video = scan_video(source)
         videos = [ video ]
         self.logger.debug(prelog + 'getting subtitles')

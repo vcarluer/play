@@ -13,7 +13,7 @@ watchPath = '/var/local/localms'
 remotePath = '/mnt/ms'
 
 def init_logger():
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
     global logger
     logger = logging.getLogger('watcher')
     logger.setLevel(logging.DEBUG)
