@@ -8,29 +8,34 @@ import sys
 import os
 import time
 
-logger = None
 watchPath = '/var/local/localms'
 remotePath = '/mnt/ms'
 
-def init_logger():
-    logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
-    global logger
-    logger = logging.getLogger('watcher')
-    logger.setLevel(logging.DEBUG)
+def init_logging():
     logDir = './logs'
     logFile = logDir + '/playwatch.log'
     if not os.path.isdir(logDir):
         os.makedirs(logDir)
 
-    logger.addHandler(logging.FileHandler(logFile))
+    logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    rootLogger = logging.getLogger()
+    rootLogger.setLevel(logging.DEBUG)
+
+    fileHandler = logging.FileHandler(logFile)
+    fileHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(fileHandler)
+
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(consoleHandler)
 
 def watch():
-    logger.info('PLAY WATCH READY!!')
-    logger.debug('logging system ready')
-    mkv_handler = MkvEventHandler(newLogger=logger)
-    mp4_handler = Mp4EventHandler(newLogger=logger, basePath=watchPath, remoteBasePath=remotePath)
-    srt_handler = SrtEventHandler(newLogger=logger)
-    vtt_handler = VttEventHandler(newLogger=logger, basePath=watchPath, remoteBasePath=remotePath)
+    logging.info('PLAY WATCH READY!!')
+    logging.debug('logging system ready')
+    mkv_handler = MkvEventHandler()
+    mp4_handler = Mp4EventHandler(basePath=watchPath, remoteBasePath=remotePath)
+    srt_handler = SrtEventHandler()
+    vtt_handler = VttEventHandler(basePath=watchPath, remoteBasePath=remotePath)
     observer = Observer()
     observer.schedule(mkv_handler, watchPath, recursive=True)
     observer.schedule(mp4_handler, watchPath, recursive=True)
@@ -43,10 +48,10 @@ def watch():
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
-    logger.info('PLAY WATCH END')
+    logging.info('PLAY WATCH END')
 
 def main():
-    init_logger()
+    init_logging()
     watch()
 
 if __name__ == '__main__':
