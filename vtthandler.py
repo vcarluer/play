@@ -3,11 +3,11 @@ import os.path
 import os
 import shutil
 
-prelog = '[MP4] '
+prelog = '[VTT] '
 
-class Mp4EventHandler(PatternMatchingEventHandler):
+class VttEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False, newLogger=None, basePath=None, remoteBasePath=None):
-        super(Mp4EventHandler, self).__init__(['*.mp4'], ignore_patterns, ignore_directories, case_sensitive)
+        super(VttEventHandler, self).__init__(['*.vtt'], ignore_patterns, ignore_directories, case_sensitive)
         self.logger = newLogger
         self.basePath = basePath
         self.remoteBasePath = remoteBasePath

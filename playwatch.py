@@ -1,6 +1,8 @@
 from watchdog.observers import Observer
 from mkvhandler import MkvEventHandler
 from mp4handler import Mp4EventHandler
+from srthandler import SrtEventHandler
+from vtthandler import VttEventHandler
 import logging
 import sys
 import os
@@ -11,7 +13,7 @@ watchPath = '/var/local/localms'
 remotePath = '/mnt/ms'
 
 def init_logger():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.ERROR)
     global logger
     logger = logging.getLogger('watcher')
     logger.setLevel(logging.DEBUG)
@@ -21,15 +23,18 @@ def init_logger():
         os.makedirs(logDir)
 
     logger.addHandler(logging.FileHandler(logFile))
-    logger.addHandler(logging.StreamHandler(sys.stdout))
 
 def watch():
     logger.debug('logging system ready')
     mkv_handler = MkvEventHandler(newLogger=logger)
     mp4_handler = Mp4EventHandler(newLogger=logger, basePath=watchPath, remoteBasePath=remotePath)
+    srt_handler = SrtEventHandler(newLogger=logger)
+    vtt_handler = VttEventHandler(newLogger=logger, basePath=watchPath, remoteBasePath=remotePath)
     observer = Observer()
     observer.schedule(mkv_handler, watchPath, recursive=True)
     observer.schedule(mp4_handler, watchPath, recursive=True)
+    observer.schedule(srt_handler, watchPath, recursive=True)
+    observer.schedule(vtt_handler, watchPath, recursive=True)
     observer.start()
     try:
         while True:
