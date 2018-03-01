@@ -2,6 +2,8 @@ from watchdog.events import PatternMatchingEventHandler
 import os.path
 import os
 import shutil
+from babelfish import Language
+from subliminal import download_best_subtitles, region, save_subtitles, scan_video
 
 prelog = '[MP4] '
 
@@ -15,6 +17,8 @@ class Mp4EventHandler(PatternMatchingEventHandler):
     def on_created(self, event):
         if not event.is_directory:
             self.logger.debug(prelog + 'creation event: ' + event.src_path)
+            self.logger.debug(prelog + 'getsrt')
+            self.getsrt(event.src_path)
             remoteFile = event.src_path.replace(self.basePath, self.remoteBasePath)
             remoteDir = os.path.dirname(remoteFile)
             if not os.path.isdir(remoteDir):
@@ -24,3 +28,11 @@ class Mp4EventHandler(PatternMatchingEventHandler):
             shutil.copy(event.src_path, remoteFile)
             os.remove(event.src_path)
             self.logger.debug(prelog + 'moved file ' + event.src_path + ' => ' + remoteFile)
+
+    def getsrt(self, source):
+        region.configure('dogpile.cache.dbm', arguments={'filename': 'cachefilesrt.dbm'})
+        video = scan_video(source)
+        videos = [ video ]
+        self.logger.debug(prelog + 'getting subtitles')
+        subtitles = download_best_subtitles(videos, {Language('eng'), Language('fra')}, providers=None, provider_configs={'addic7ed': {'username': 'legeek1337', 'password': 'j4TAz0BMsbhBICg7'}, 'opensubtitles': {'username': 'legeek', 'password': 'coolcool'}})
+        save_subtitles(video, subtitles[video])
