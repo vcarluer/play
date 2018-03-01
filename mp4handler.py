@@ -15,24 +15,29 @@ class Mp4EventHandler(PatternMatchingEventHandler):
         self.remoteBasePath = remoteBasePath
 
     def on_created(self, event):
-        if not event.is_directory:
-            try:
-                logging.debug(prelog + 'creation event: ' + event.src_path)
-                logging.debug(prelog + 'getsrt')
-                self.getsrt(event.src_path)
-                remoteFile = event.src_path.replace(self.basePath, self.remoteBasePath)
-                remoteDir = os.path.dirname(remoteFile)
-                if not os.path.isdir(remoteDir):
-                    logging.debug(prelog + 'creating remote dir: ' + remoteDir)
-                    os.makedirs(remoteDir)
+        self.do(event.src_path)
 
-                logging.debug(prelog + 'copying file to ' + remoteFile)
-                shutil.copy(event.src_path, remoteFile)
-                os.remove(event.src_path)
-                logging.debug(prelog + 'moved file ' + event.src_path + ' => ' + remoteFile)
-            except:
-                logging.exception(prelog)
-                pass
+    def on_moved(self, event):
+        self.do(event.dst_path)
+
+    def do(self, path):
+        try:
+            logging.debug(prelog + 'creation event: ' + path)
+            logging.debug(prelog + 'getsrt')
+            self.getsrt(path)
+            remoteFile = path.replace(self.basePath, self.remoteBasePath)
+            remoteDir = os.path.dirname(remoteFile)
+            if not os.path.isdir(remoteDir):
+                logging.debug(prelog + 'creating remote dir: ' + remoteDir)
+                os.makedirs(remoteDir)
+
+            logging.debug(prelog + 'copying file to ' + remoteFile)
+            shutil.copy(path, remoteFile)
+            os.remove(path)
+            logging.debug(prelog + 'moved file ' + path + ' => ' + remoteFile)
+        except:
+            logging.exception(prelog)
+            pass
 
     def getsrt(self, source):
         try:

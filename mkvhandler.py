@@ -11,16 +11,21 @@ class MkvEventHandler(PatternMatchingEventHandler):
         super(MkvEventHandler, self).__init__(['*.mkv'], ignore_patterns, ignore_directories, case_sensitive)
 
     def on_created(self, event):
-        if not event.is_directory:
-            try:
-                logging.debug(prelog + 'creation event: ' + event.src_path)
-                mp4Path = transcode(event.src_path)
-                logging.info(prelog + 'transcode done: ' + event.src_path + ' => ' + mp4Path)
-                os.remove(event.src_path)
-                logging.info(prelog + 'file removed ' + event.src_path)
-            except:
-                logging.exception(prelog)
-                pass
+        self.do(event.src_path)
+
+    def on_moved(self, event):
+        self.do(event.dst_path)
+
+    def do(self, path):
+        try:
+            logging.debug(prelog + 'creation event: ' + path)
+            mp4Path = transcode(path)
+            logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
+            os.remove(path)
+            logging.info(prelog + 'file removed ' + path)
+        except:
+            logging.exception(prelog)
+            pass
 
 def transcode(source):
     sourceDir = os.path.dirname(source)

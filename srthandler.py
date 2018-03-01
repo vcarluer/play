@@ -11,16 +11,21 @@ class SrtEventHandler(PatternMatchingEventHandler):
         super(SrtEventHandler, self).__init__(['*.srt'], ignore_patterns, ignore_directories, case_sensitive)
 
     def on_created(self, event):
-        if not event.is_directory:
-            try:
-                logging.debug(prelog + 'creation event: ' + event.src_path)
-                vttPath = self.transcode(event.src_path)
-                logging.info(prelog + 'transcode done: ' + event.src_path + ' => ' + vttPath)
-                os.remove(event.src_path)
-                logging.info(prelog + 'file removed ' + event.src_path)
-            except:
-                logging.exception(prelog)
-                pass
+        self.do(event.src_path)
+
+    def on_moved(self, event):
+        self.do(event.dst_path)
+
+    def do(self, path):
+        try:
+            logging.debug(prelog + 'creation event: ' + path)
+            vttPath = self.transcode(path)
+            logging.info(prelog + 'transcode done: ' + path + ' => ' + vttPath)
+            os.remove(path)
+            logging.info(prelog + 'file removed ' + path)
+        except:
+            logging.exception(prelog)
+            pass
 
     def transcode(self, source):
         sourceDir = os.path.dirname(source)
