@@ -12,11 +12,15 @@ class SrtEventHandler(PatternMatchingEventHandler):
 
     def on_created(self, event):
         if not event.is_directory:
-            self.logger.debug(prelog + 'creation event: ' + event.src_path)
-            vttPath = self.transcode(event.src_path)
-            self.logger.info(prelog + 'transcode done: ' + event.src_path + ' => ' + vttPath)
-            os.remove(event.src_path)
-            self.logger.info(prelog + 'file removed ' + event.src_path)
+            try:
+                self.logger.debug(prelog + 'creation event: ' + event.src_path)
+                vttPath = self.transcode(event.src_path)
+                self.logger.info(prelog + 'transcode done: ' + event.src_path + ' => ' + vttPath)
+                os.remove(event.src_path)
+                self.logger.info(prelog + 'file removed ' + event.src_path)
+            except:
+                self.logger.exception(prelog)
+                pass
 
     def transcode(self, source):
         sourceDir = os.path.dirname(source)

@@ -16,18 +16,22 @@ class Mp4EventHandler(PatternMatchingEventHandler):
 
     def on_created(self, event):
         if not event.is_directory:
-            self.logger.debug(prelog + 'creation event: ' + event.src_path)
-            self.logger.debug(prelog + 'getsrt')
-            self.getsrt(event.src_path)
-            remoteFile = event.src_path.replace(self.basePath, self.remoteBasePath)
-            remoteDir = os.path.dirname(remoteFile)
-            if not os.path.isdir(remoteDir):
-                self.logger.debug(prelog + 'creating remote dir: ' + remoteDir)
-                os.makedirs(remoteDir)
+            try:
+                self.logger.debug(prelog + 'creation event: ' + event.src_path)
+                self.logger.debug(prelog + 'getsrt')
+                self.getsrt(event.src_path)
+                remoteFile = event.src_path.replace(self.basePath, self.remoteBasePath)
+                remoteDir = os.path.dirname(remoteFile)
+                if not os.path.isdir(remoteDir):
+                    self.logger.debug(prelog + 'creating remote dir: ' + remoteDir)
+                    os.makedirs(remoteDir)
 
-            shutil.copy(event.src_path, remoteFile)
-            os.remove(event.src_path)
-            self.logger.debug(prelog + 'moved file ' + event.src_path + ' => ' + remoteFile)
+                shutil.copy(event.src_path, remoteFile)
+                os.remove(event.src_path)
+                self.logger.debug(prelog + 'moved file ' + event.src_path + ' => ' + remoteFile)
+            except:
+                self.logger.exception(prelog)
+                pass
 
     def getsrt(self, source):
         region.configure('dogpile.cache.dbm', arguments={'filename': 'cachefilesrt.dbm'})

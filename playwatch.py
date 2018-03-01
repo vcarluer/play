@@ -25,6 +25,7 @@ def init_logger():
     logger.addHandler(logging.FileHandler(logFile))
 
 def watch():
+    logger.info('PLAY WATCH READY!!')
     logger.debug('logging system ready')
     mkv_handler = MkvEventHandler(newLogger=logger)
     mp4_handler = Mp4EventHandler(newLogger=logger, basePath=watchPath, remoteBasePath=remotePath)
@@ -42,6 +43,7 @@ def watch():
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
+    logger.info('PLAY WATCH END')
 
 def main():
     init_logger()
