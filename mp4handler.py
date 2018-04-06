@@ -11,18 +11,21 @@ prelog = '[MP4] '
 class Mp4EventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False, basePath=None, remoteBasePath=None):
         super(Mp4EventHandler, self).__init__(['*.mp4'], ignore_patterns, ignore_directories, case_sensitive)
+        logging.info(prelog + 'Handler ready')
         self.basePath = basePath
         self.remoteBasePath = remoteBasePath
 
     def on_created(self, event):
+        logging.debug(prelog + 'creation event: ' + event.src_path)
         self.do(event.src_path)
 
     def on_moved(self, event):
+        logging.debug(prelog + 'moved event: ' + event.dst_path)
         self.do(event.dst_path)
 
     def do(self, path):
         try:
-            logging.debug(prelog + 'creation event: ' + path)
+            logging.info(prelog + 'Action start on ' + path)
             logging.debug(prelog + 'getsrt')
             self.getsrt(path)
             remoteFile = path.replace(self.basePath, self.remoteBasePath)
@@ -31,10 +34,10 @@ class Mp4EventHandler(PatternMatchingEventHandler):
                 logging.debug(prelog + 'creating remote dir: ' + remoteDir)
                 os.makedirs(remoteDir)
 
-            logging.debug(prelog + 'copying file to ' + remoteFile)
+            logging.info(prelog + 'copying file to ' + remoteFile)
             shutil.copy(path, remoteFile)
             os.remove(path)
-            logging.debug(prelog + 'moved file ' + path + ' => ' + remoteFile)
+            logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
         except:
             logging.exception(prelog)
             pass

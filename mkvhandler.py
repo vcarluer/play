@@ -8,17 +8,20 @@ import shutil
 prelog = '[MKV] '
 class MkvEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False):
+        logging.info(prelog + 'Handler ready')
         super(MkvEventHandler, self).__init__(['*.mkv'], ignore_patterns, ignore_directories, case_sensitive)
 
     def on_created(self, event):
+        logging.debug(prelog + 'creation event: ' + event.src_path)
         self.do(event.src_path)
 
     def on_moved(self, event):
+        logging.debug(prelog + 'moved event: ' + event.dst_path)
         self.do(event.dst_path)
 
     def do(self, path):
         try:
-            logging.debug(prelog + 'creation event: ' + path)
+            logging.info(prelog + 'transcode start ' + path)
             mp4Path = transcode(path)
             logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
             os.remove(path)

@@ -9,16 +9,19 @@ prelog = '[SRT] '
 class SrtEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None, ignore_directories=False, case_sensitive=False):
         super(SrtEventHandler, self).__init__(['*.srt'], ignore_patterns, ignore_directories, case_sensitive)
+        logging.info(prelog + 'Handler ready')
 
     def on_created(self, event):
+        logging.debug(prelog + 'creation event: ' + event.src_path)
         self.do(event.src_path)
 
     def on_moved(self, event):
+        logging.debug(prelog + 'moved event: ' + event.dst_path)
         self.do(event.dst_path)
 
     def do(self, path):
         try:
-            logging.debug(prelog + 'creation event: ' + path)
+            logging.info(prelog + 'transcoding: ' + path)
             vttPath = self.transcode(path)
             logging.info(prelog + 'transcode done: ' + path + ' => ' + vttPath)
             os.remove(path)
