@@ -21,9 +21,9 @@ def init_logging():
     rootLogger = logging.getLogger()
     rootLogger.setLevel(logging.INFO)
 
-    fileHandler = logging.FileHandler(logFile)
-    fileHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(fileHandler)
+    #fileHandler = logging.FileHandler(logFile)
+    #fileHandler.setFormatter(logFormatter)
+    #rootLogger.addHandler(fileHandler)
 
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)

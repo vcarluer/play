@@ -4,6 +4,7 @@ from ffmpy import FFmpeg
 import os.path
 import os
 import shutil
+from multiprocessing import Process
 
 prelog = '[MKV] '
 class MkvEventHandler(PatternMatchingEventHandler):
@@ -20,15 +21,17 @@ class MkvEventHandler(PatternMatchingEventHandler):
         self.do(event.dst_path)
 
     def do(self, path):
-        try:
-            logging.info(prelog + 'transcode start ' + path)
-            mp4Path = transcode(path)
-            logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
-            os.remove(path)
-            logging.info(prelog + 'file removed ' + path)
-        except:
-            logging.exception(prelog)
-            pass
+        logging.debug(prelog + 'do')
+        p = Process(target=self.do_process, args=(path,))
+        p.start()
+        logging.debug(prelog + 'process started')
+
+    def do_process(self, path):
+        logging.info(prelog + 'transcode start ' + path)
+        mp4Path = transcode(path)
+        logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
+        os.remove(path)
+        logging.info(prelog + 'file removed ' + path)
 
 def transcode(source):
     sourceDir = os.path.dirname(source)

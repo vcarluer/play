@@ -3,6 +3,7 @@ from watchdog.events import PatternMatchingEventHandler
 import os.path
 import os
 import shutil
+from multiprocessing import Process
 
 prelog = '[VTT] '
 
@@ -22,17 +23,19 @@ class VttEventHandler(PatternMatchingEventHandler):
         self.do(event.dst_path)
 
     def do(self, path):
-        try:
-            logging.debug(prelog + 'Action start on ' + path)
-            remoteFile = path.replace(self.basePath, self.remoteBasePath)
-            remoteDir = os.path.dirname(remoteFile)
-            if not os.path.isdir(remoteDir):
-                logging.debug(prelog + 'creating remote dir: ' + remoteDir)
-                os.makedirs(remoteDir)
+        logging.debug(prelog + 'do')
+        p = Process(target=self.do_process, args=(path,))
+        p.start()
+        logging.debug(prelog + 'process started')
 
-            shutil.copy(path, remoteFile)
-            os.remove(path)
-            logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
-        except:
-            logging.exception(prelog)
-            pass
+    def do_process(self, path):
+        logging.debug(prelog + 'Action start on ' + path)
+        remoteFile = path.replace(self.basePath, self.remoteBasePath)
+        remoteDir = os.path.dirname(remoteFile)
+        if not os.path.isdir(remoteDir):
+            logging.debug(prelog + 'creating remote dir: ' + remoteDir)
+            os.makedirs(remoteDir)
+
+        shutil.copy(path, remoteFile)
+        os.remove(path)
+        logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)

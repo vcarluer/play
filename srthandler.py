@@ -4,6 +4,7 @@ from webvtt import WebVTT
 import os.path
 import os
 import chardet
+from multiprocessing import Process
 
 prelog = '[SRT] '
 class SrtEventHandler(PatternMatchingEventHandler):
@@ -20,15 +21,17 @@ class SrtEventHandler(PatternMatchingEventHandler):
         self.do(event.dst_path)
 
     def do(self, path):
-        try:
-            logging.info(prelog + 'transcoding: ' + path)
-            vttPath = self.transcode(path)
-            logging.info(prelog + 'transcode done: ' + path + ' => ' + vttPath)
-            os.remove(path)
-            logging.info(prelog + 'file removed ' + path)
-        except:
-            logging.exception(prelog)
-            pass
+        logging.debug(prelog + 'do')
+        p = Process(target=self.do_process, args=(path,))
+        p.start()
+        logging.debug(prelog + 'process started')
+
+    def do_process(self, path):
+        logging.info(prelog + 'transcoding: ' + path)
+        vttPath = self.transcode(path)
+        logging.info(prelog + 'transcode done: ' + path + ' => ' + vttPath)
+        os.remove(path)
+        logging.info(prelog + 'file removed ' + path)
 
     def transcode(self, source):
         sourceDir = os.path.dirname(source)

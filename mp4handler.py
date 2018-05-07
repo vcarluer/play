@@ -5,6 +5,7 @@ import os
 import shutil
 from babelfish import Language
 from subliminal import download_best_subtitles, region, save_subtitles, scan_video
+from multiprocessing import Process
 
 prelog = '[MP4] '
 
@@ -24,23 +25,25 @@ class Mp4EventHandler(PatternMatchingEventHandler):
         self.do(event.dst_path)
 
     def do(self, path):
-        try:
-            logging.info(prelog + 'Action start on ' + path)
-            logging.debug(prelog + 'getsrt')
-            self.getsrt(path)
-            remoteFile = path.replace(self.basePath, self.remoteBasePath)
-            remoteDir = os.path.dirname(remoteFile)
-            if not os.path.isdir(remoteDir):
-                logging.debug(prelog + 'creating remote dir: ' + remoteDir)
-                os.makedirs(remoteDir)
+        logging.debug(prelog + 'do')
+        p = Process(target=self.do_process, args=(path,))
+        p.start()
+        logging.debug(prelog + 'process started')
 
-            logging.info(prelog + 'copying file to ' + remoteFile)
-            shutil.copy(path, remoteFile)
-            os.remove(path)
-            logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
-        except:
-            logging.exception(prelog)
-            pass
+    def do_process(self, path):
+        logging.info(prelog + 'Action start on ' + path)
+        logging.debug(prelog + 'getsrt')
+        self.getsrt(path)
+        remoteFile = path.replace(self.basePath, self.remoteBasePath)
+        remoteDir = os.path.dirname(remoteFile)
+        if not os.path.isdir(remoteDir):
+            logging.debug(prelog + 'creating remote dir: ' + remoteDir)
+            os.makedirs(remoteDir)
+
+        logging.info(prelog + 'copying file to ' + remoteFile)
+        shutil.copy(path, remoteFile)
+        os.remove(path)
+        logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
 
     def getsrt(self, source):
         try:
