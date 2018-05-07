@@ -1,5 +1,4 @@
 import logging
-from ffmpy import FFmpeg
 import os.path
 import os
 import shutil
