@@ -31,26 +31,39 @@ def start_watch():
         time.sleep(10)
 
 def handle_file(path):
-    logging.info(prelog + 'transcode start ' + path)
-    mp4Path = transcode(path)
-    logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
-    os.remove(path)
-    logging.info(prelog + 'file removed ' + path)
+    try:
+        logging.info(prelog + 'transcode start ' + path)
+        mp4Path = transcode(path)
+        logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
+        os.remove(path)
+        logging.info(prelog + 'file removed ' + path)
+    except:
+        logging.exception(prelog)
+        if os.path.isfile(path):
+            shutil.move(path, path + '.failed')
+        pass
 
 def transcode(source):
-    sourceDir = os.path.dirname(source)
-    sourceFile = os.path.basename(source)
-    sourceFileNoExt = os.path.splitext(sourceFile)[0]
-    targetFile = sourceFileNoExt + '.mp4'
-    tempFull = '/tmp/' + targetFile
-    logging.debug(prelog + 'tempFull: ' + tempFull)
-    targetFull = sourceDir + '/' + targetFile
-    logging.debug(prelog + 'targetFull: ' + targetFull)
-    ff=FFmpeg(inputs={source: None}, outputs={tempFull: '-c:a aac -c:v copy -y -loglevel info' })
-    # ff.cmd
-    ff.run()
-    shutil.move(tempFull, targetFull)
-    return targetFull
+    try:
+        sourceDir = os.path.dirname(source)
+        sourceFile = os.path.basename(source)
+        sourceFileNoExt = os.path.splitext(sourceFile)[0]
+        targetFile = sourceFileNoExt + '.mp4'
+        tempFull = '/tmp/' + targetFile
+        logging.debug(prelog + 'tempFull: ' + tempFull)
+        targetFull = sourceDir + '/' + targetFile
+        logging.debug(prelog + 'targetFull: ' + targetFull)
+        ff=FFmpeg(inputs={source: None}, outputs={tempFull: '-c:a aac -c:v copy -y -loglevel info' })
+        # ff.cmd
+        ff.run()
+        shutil.move(tempFull, targetFull)
+        return targetFull
+    except:
+        logging.exception(prelog)
+        if os.path.isfile(source):
+            shutil.move(source, source + '.failed')
+        pass
+    return None
 
 if __name__ == "__main__":
     init_logging()

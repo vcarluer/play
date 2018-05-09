@@ -10,6 +10,7 @@ from subliminal import download_best_subtitles, region, save_subtitles, scan_vid
 fileType = 'MP4'
 prelog = '[' + fileType + '] '
 watchPath = '/var/local/localms'
+srtPath = '/var/local/localsrt'
 remotePath = '/mnt/ms'
 patternPath = watchPath + '/**/*.mp4'
 logLevel = logging.DEBUG
@@ -34,30 +35,43 @@ def start_watch():
         time.sleep(10)
 
 def handle_file(path):
-    logging.info(prelog + 'Action start on ' + path)
-    logging.debug(prelog + 'getsrt')
-    getsrt(path)
-    remoteFile = path.replace(watchPath, remotePath)
-    remoteDir = os.path.dirname(remoteFile)
-    if not os.path.isdir(remoteDir):
-        logging.debug(prelog + 'creating remote dir: ' + remoteDir)
-        os.makedirs(remoteDir)
+    try:
+        logging.info(prelog + 'Action start on ' + path)
+        logging.debug(prelog + 'getsrt')
+        getsrt(path)
+        remoteFile = path.replace(watchPath, remotePath)
+        remoteDir = os.path.dirname(remoteFile)
+        if not os.path.isdir(remoteDir):
+            logging.debug(prelog + 'creating remote dir: ' + remoteDir)
+            os.makedirs(remoteDir)
 
-    logging.info(prelog + 'copying file to ' + remoteFile)
-    shutil.copy(path, remoteFile)
-    os.remove(path)
-    logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
+        logging.info(prelog + 'copying file to ' + remoteFile)
+        shutil.copy(path, remoteFile)
+        os.remove(path)
+        logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
+    except:
+        logging.exception(prelog)
+        if os.path.isfile(path):
+            shutil.move(path, path + '.failed')
+        pass
 
 def getsrt(source):
     try:
-        region.configure('dogpile.cache.dbm', arguments={'filename': '/var/local/localms/cachefilesrt.dbm'})
+        region.configure('dogpile.cache.dbm', arguments={'filename': srtPath + '/cachefilesrt.dbm'})
         video = scan_video(source)
         videos = [ video ]
         logging.debug(prelog + 'getting subtitles')
         subtitles = download_best_subtitles(videos, {Language('eng'), Language('fra')}, providers=None, provider_configs={'addic7ed': {'username': 'legeek1337', 'password': 'j4TAz0BMsbhBICg7'}, 'opensubtitles': {'username': 'legeek', 'password': 'coolcool'}})
-        save_subtitles(video, subtitles[video])
+        sourceDir = os.path.dirname(source)
+        savePath = sourceDir.replace(watchPath, srtPath)
+        if not os.path.isdir(savePath):
+            logging.debug(prelog + 'creating srt directory ' + savePath)
+            os.makedirs(savePath)
+        save_subtitles(video, subtitles[video], directory=savePath)
     except:
         logging.exception(prelog)
+        if os.path.isfile(source):
+            shutil.move(source, source + '.failed')
         pass
 
 if __name__ == "__main__":

@@ -1,2 +1,2 @@
-play: self multiprocessing code based on find
+play: separate mkv & srt work path, handle fr, try once per day
 playweb: user management / safe user passwd: children

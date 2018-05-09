@@ -5,10 +5,11 @@ import time
 import glob
 from webvtt import WebVTT
 import chardet
+import shutil
 
 fileType = 'SRT'
 prelog = '[' + fileType + '] '
-watchPath = '/var/local/localms'
+watchPath = '/var/local/localsrt'
 patternPath = watchPath + '/**/*.srt'
 logLevel = logging.DEBUG
 
@@ -32,24 +33,38 @@ def start_watch():
         time.sleep(10)
 
 def handle_file(path):
-    logging.info(prelog + 'transcoding: ' + path)
-    vttPath = transcode(path)
-    logging.info(prelog + 'transcode done: ' + path + ' => ' + vttPath)
-    os.remove(path)
-    logging.info(prelog + 'file removed ' + path)
+    try:
+        logging.info(prelog + 'transcoding: ' + path)
+        vttPath = transcode(path)
+        if os.path.isfile(path):
+            logging.info(prelog + 'transcode done: ' + path + ' => ' + vttPath)
+            os.remove(path)
+            logging.info(prelog + 'file removed ' + path)
+    except:
+        logging.exception(prelog)
+        if os.path.isfile(path):
+            shutil.move(path, path + '.failed')
+        pass
 
 def transcode(source):
-    sourceDir = os.path.dirname(source)
-    sourceFile = os.path.basename(source)
-    sourceFileNoExt = os.path.splitext(sourceFile)[0]
-    targetFile = sourceFileNoExt + '.vtt'
-    convert_ending(source)
-    clean_file(source)
-    targetFull = sourceDir + '/' + targetFile
-    logging.debug(prelog + 'targetFull: ' + targetFull)
-    webvtt = WebVTT().from_srt(source)
-    webvtt.save(targetFull)
-    return targetFull
+    try:
+        sourceDir = os.path.dirname(source)
+        sourceFile = os.path.basename(source)
+        sourceFileNoExt = os.path.splitext(sourceFile)[0]
+        targetFile = sourceFileNoExt + '.vtt'
+        convert_ending(source)
+        clean_file(source)
+        targetFull = sourceDir + '/' + targetFile
+        logging.debug(prelog + 'targetFull: ' + targetFull)
+        webvtt = WebVTT().from_srt(source)
+        webvtt.save(targetFull)
+        return targetFull
+    except:
+        logging.exception(prelog)
+        if os.path.isfile(source):
+            shutil.move(source, source + '.failed')
+        pass
+    return None
 
 def clean_file(filename):
     logging.debug(prelog + 'clean file')

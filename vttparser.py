@@ -7,7 +7,7 @@ import glob
 
 fileType = 'VTT'
 prelog = '[' + fileType + '] '
-watchPath = '/var/local/localms'
+watchPath = '/var/local/localsrt'
 remotePath = '/mnt/ms'
 patternPath = watchPath + '/**/*.vtt'
 logLevel = logging.DEBUG
@@ -32,16 +32,22 @@ def start_watch():
         time.sleep(10)
 
 def handle_file(path):
-    logging.debug(prelog + 'Action start on ' + path)
-    remoteFile = path.replace(watchPath, remotePath)
-    remoteDir = os.path.dirname(remoteFile)
-    if not os.path.isdir(remoteDir):
-        logging.debug(prelog + 'creating remote dir: ' + remoteDir)
-        os.makedirs(remoteDir)
+    try:
+        logging.debug(prelog + 'Action start on ' + path)
+        remoteFile = path.replace(watchPath, remotePath)
+        remoteDir = os.path.dirname(remoteFile)
+        if not os.path.isdir(remoteDir):
+            logging.debug(prelog + 'creating remote dir: ' + remoteDir)
+            os.makedirs(remoteDir)
 
-    shutil.copy(path, remoteFile)
-    os.remove(path)
-    logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
+        shutil.copy(path, remoteFile)
+        os.remove(path)
+        logging.info(prelog + 'moved file ' + path + ' => ' + remoteFile)
+    except:
+        logging.exception(prelog)
+        if os.path.isfile(path):
+            shutil.move(path, path + '.failed')
+        pass
 
 if __name__ == "__main__":
     init_logging()
