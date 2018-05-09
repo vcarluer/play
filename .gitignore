@@ -3,3 +3,9 @@ __pycache__
 logs
 cachefiles*
 nohup.out
+Pipfile
+hupmkv
+hupmp4
+hupsrt
+hupvtt
+movies
