@@ -11,7 +11,7 @@ fileType = 'SRT'
 prelog = '[' + fileType + '] '
 watchPath = '/var/local/localsrt'
 patternPath = watchPath + '/**/*.srt'
-logLevel = logging.DEBUG
+logLevel = logging.INFO
 
 def init_logging():
     logDir = './logs'

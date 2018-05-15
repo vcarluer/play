@@ -9,7 +9,7 @@ import glob
 prelog = '[MKV] '
 watchPath = '/var/local/localms'
 patternPath = watchPath + '/**/*.mkv'
-logLevel = logging.DEBUG
+logLevel = logging.INFO
 
 def init_logging():
     logDir = './logs'

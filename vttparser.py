@@ -10,7 +10,7 @@ prelog = '[' + fileType + '] '
 watchPath = '/var/local/localsrt'
 remotePath = '/mnt/ms'
 patternPath = watchPath + '/**/*.vtt'
-logLevel = logging.DEBUG
+logLevel = logging.INFO
 
 def init_logging():
     logDir = './logs'

@@ -13,7 +13,7 @@ watchPath = '/var/local/localms'
 srtPath = '/var/local/localsrt'
 remotePath = '/mnt/ms'
 patternPath = watchPath + '/**/*.mp4'
-logLevel = logging.DEBUG
+logLevel = logging.INFO
 
 def init_logging():
     logDir = './logs'
@@ -55,9 +55,10 @@ def handle_file(path):
             shutil.move(path, path + '.failed')
         pass
 
+# should be done in deficated agent
 def getsrt(source):
     try:
-        region.configure('dogpile.cache.dbm', arguments={'filename': srtPath + '/cachefilesrt.dbm'})
+        region.configure('dogpile.cache.dbm', arguments={'filename': 'cachefilesrt.dbm'})
         video = scan_video(source)
         videos = [ video ]
         logging.debug(prelog + 'getting subtitles')
@@ -70,8 +71,6 @@ def getsrt(source):
         save_subtitles(video, subtitles[video], directory=savePath)
     except:
         logging.exception(prelog)
-        if os.path.isfile(source):
-            shutil.move(source, source + '.failed')
         pass
 
 if __name__ == "__main__":
