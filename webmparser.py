@@ -7,12 +7,12 @@ import glob
 from babelfish import Language
 from subliminal import download_best_subtitles, region, save_subtitles, scan_video
 
-fileType = 'MP4'
+fileType = 'WEBM'
 prelog = '[' + fileType + '] '
 watchPath = '/var/local/localms'
 srtPath = '/var/local/localsrt'
 remotePath = '/mnt/ms'
-patternPath = watchPath + '/**/*.mp4'
+patternPath = watchPath + '/**/*.webm'
 logLevel = logging.INFO
 
 def init():

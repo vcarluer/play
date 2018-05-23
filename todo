@@ -1,2 +1,6 @@
 play: separate mkv & srt work path, handle fr, try once per day
 playweb: user management / safe user passwd: children
+srt on mkv!
+detect video and audio dynamically
+move failed?
+restart scan

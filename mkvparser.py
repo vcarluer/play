@@ -48,12 +48,20 @@ def transcode(source):
         sourceDir = os.path.dirname(source)
         sourceFile = os.path.basename(source)
         sourceFileNoExt = os.path.splitext(sourceFile)[0]
-        targetFile = sourceFileNoExt + '.mp4'
+        ext = '.mp4'
+        if 'VP9' in source:
+            ext = '.webm'
+        targetFile = sourceFileNoExt + ext
         tempFull = '/tmp/' + targetFile
         logging.debug(prelog + 'tempFull: ' + tempFull)
         targetFull = sourceDir + '/' + targetFile
         logging.debug(prelog + 'targetFull: ' + targetFull)
-        ff=FFmpeg(inputs={source: None}, outputs={tempFull: '-c:a aac -c:v copy -y -loglevel info' })
+        if ext == '.webm':
+            logging.info('VP9 detected. Audio to libvorbis and webm container')
+            ff=FFmpeg(inputs={source: None}, outputs={tempFull: '-c:a libvorbis -c:v copy -y -loglevel info' })
+        else:
+            logging.debug('Assume video is h264. Audio to aac and mp4 container')
+            ff=FFmpeg(inputs={source: None}, outputs={tempFull: '-c:a aac -c:v copy -y -loglevel info' })
         # ff.cmd
         ff.run()
         shutil.move(tempFull, targetFull)
