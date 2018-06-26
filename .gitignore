@@ -4,9 +4,5 @@ logs
 cachefiles*
 nohup.out
 Pipfile
-hupmkv
-hupmp4
-hupsrt
-hupvtt
-hupwebm
+hup*
 movies
