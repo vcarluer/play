@@ -71,7 +71,7 @@ def transcode(source):
         targetTranscode = tempFull
         isMnt = False
         # direct transcode if from mnt storage box
-        if 'mnt/.sb' in source
+        if 'mnt/.sb' in source:
             targetTranscode = targetFull
             isMnt = True
             
