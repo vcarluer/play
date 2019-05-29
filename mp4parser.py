@@ -12,8 +12,9 @@ prelog = '[' + fileType + '] '
 watchPath = '/var/local/localms'
 srtPath = '/var/local/localsrt'
 remotePath = '/mnt/ms'
-patternPath = watchPath + '/**/*.mp4'
-logLevel = logging.INFO
+pattern = '/**/*.mp4'
+patternPath = watchPath + pattern
+logLevel = logging.DEBUG
 
 def init():
     region.configure('dogpile.cache.dbm', arguments={'filename': 'cachefilesrt.dbm'})
@@ -59,14 +60,14 @@ def handle_file(path):
         pass
 
 # should be done in deficated agent
-def getsrt(source):
+def getsrt(source, srcPath=watchPath):
     try:
         video = scan_video(source)
         videos = [ video ]
         logging.debug(prelog + 'getting subtitles')
         subtitles = download_best_subtitles(videos, {Language('eng'), Language('fra')}, providers=None, provider_configs={'addic7ed': {'username': 'legeek1337', 'password': 'j4TAz0BMsbhBICg7'}, 'opensubtitles': {'username': 'legeek', 'password': 'coolcool'}})
         sourceDir = os.path.dirname(source)
-        savePath = sourceDir.replace(watchPath, srtPath)
+        savePath = sourceDir.replace(srcPath, srtPath)
         if not os.path.isdir(savePath):
             logging.debug(prelog + 'creating srt directory ' + savePath)
             os.makedirs(savePath)
@@ -74,6 +75,16 @@ def getsrt(source):
     except:
         logging.exception(prelog)
         pass
+
+def getAllSrt(dirPath, searchPattern=pattern):
+    init()
+    init_logging()
+    scanPathPattern = dirPath + searchPattern
+    logging.debug(("{} scanning {}").format("GETALLSRT", srtPath))
+    for fileName in glob.glob(scanPathPattern, recursive=True):
+        logging.debug(("{}{} file detected in {}: {}").format("GETALLSRT", fileType, srtPath, fileName))
+        getsrt(fileName, dirPath)
+
 
 if __name__ == "__main__":
     init()

@@ -9,26 +9,33 @@ import shutil
 
 fileType = 'SRT'
 prelog = '[' + fileType + '] '
-watchPath = '/var/local/localsrt'
-patternPath = watchPath + '/**/*.srt'
-logLevel = logging.INFO
+defaultWatchPath = '/var/local/localsrt'
+watchPattern = '/**/*.srt'
+logLevel = logging.DEBUG
 
-def init_logging():
+def init_logging(ext = ""):
     logDir = './logs'
-    logFile = logDir + '/' + fileType + 'parser.log'
+    logFile = logDir + '/' + fileType + ext + 'parser.log'
     if not os.path.isdir(logDir):
         os.makedirs(logDir)
 
     logging.basicConfig(filename=logFile,level=logLevel)
     logging.debug(("{}Logger ready").format(prelog))
 
+def convert_all(srtPath, ext):
+    init_logging(ext)
+    loop_file(srtPath)
+
+def loop_file(loopPath):
+    patternPath = loopPath + watchPattern
+    for fileName in glob.glob(patternPath, recursive=True):
+        logging.debug(("{}{} file detected in {}: {}").format(prelog, fileType, loopPath, fileName))
+        handle_file(fileName)
+
 def start_watch():
     while True:
         logging.debug(("{}loop").format(prelog))
-        for fileName in glob.glob(patternPath, recursive=True):
-            logging.debug(("{}{} file detected in {}: {}").format(prelog, fileType, watchPath, fileName))
-            handle_file(fileName)
-
+        loop_file(defaultWatchPath)
         logging.debug(("{} waiting").format(prelog))
         time.sleep(10)
 
