@@ -9,8 +9,8 @@ from subliminal import download_best_subtitles, region, save_subtitles, scan_vid
 
 fileType = 'WEBM'
 prelog = '[' + fileType + '] '
-watchPath = '/var/local/localms'
-srtPath = '/var/local/localsrt'
+watchPath = '/mnt/sb/mediapipe/ms'
+srtPath = '/mnt/sb/mediapipe/srt'
 remotePath = '/mnt/ms'
 patternPath = watchPath + '/**/*.webm'
 logLevel = logging.INFO

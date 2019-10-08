@@ -7,7 +7,7 @@ import time
 import glob
 
 prelog = '[MKV] '
-watchPath = '/var/local/localms'
+watchPath = '/mnt/sb/mediapipe/ms'
 searchPattern = '/**/*.mkv'
 logLevel = logging.INFO
 logFileName = 'mkvparser.log'
@@ -45,11 +45,19 @@ def start_watch(loopPath):
 
 def handle_file(path):
     try:
+        sourceDir = os.path.dirname(path)
+        markupFile = sourceDir + '/copied'
+        if not os.path.isfile(markupFile):
+            logging.info(prelog + path + ' file is not fully copied, will wait for ' + markupFile)
+            return
+
         logging.info(prelog + 'transcode start ' + path)
         mp4Path = transcode(path)
         logging.info(prelog + 'transcode done: ' + path + ' => ' + mp4Path)
         os.remove(path)
         logging.info(prelog + 'file removed ' + path)
+        os.remove(markupFile)
+        logging.info(prelog + 'Markup file removed: ' + markupFile)
     except:
         logging.exception(prelog)
         if os.path.isfile(path):
@@ -65,13 +73,13 @@ def transcode(source):
         if 'VP9' in source:
             ext = '.webm'
         targetFile = sourceFileNoExt + ext
-        tempFull = '/tmp/' + targetFile
+        tempFull = '/mnt/sb/mediapipe/tmp/' + targetFile
         logging.debug(prelog + 'tempFull: ' + tempFull)
         targetFull = sourceDir + '/' + targetFile
         targetTranscode = tempFull
         isMnt = False
         # direct transcode if from mnt storage box
-        if 'mnt/.sb' in source:
+        if 'mnt/sb' in source:
             targetTranscode = targetFull
             isMnt = True
             

@@ -7,7 +7,7 @@ import glob
 
 fileType = 'VTT'
 prelog = '[' + fileType + '] '
-watchPath = '/var/local/localsrt'
+watchPath = '/mnt/sb/mediapipe/srt'
 remotePath = '/mnt/ms'
 patternPath = watchPath + '/**/*.vtt'
 logLevel = logging.INFO

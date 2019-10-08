@@ -5,9 +5,9 @@ import datetime
 
 logLevel = logging.DEBUG
 logging.basicConfig(level=logLevel)
-fileToShift = '/mnt/ms/movies/Ready Player One (2018)/Ready.Player.One.2018.720p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT.en.vtt'
-fileout = '/mnt/ms/movies/Ready Player One (2018)/Ready.Player.One.2018.720p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT.en.vtt.shift'
-shiftSec = 4
+fileToShift = '/mnt/ms/movies/John Wick Chapter 3 Parabellum (2019)/John.Wick.Chapter.3.Parabellum.2019.1080p.WEBRip.x264-RARBG.fr.vtt'
+fileout = '/mnt/ms/movies/John Wick Chapter 3 Parabellum (2019)/John.Wick.Chapter.3.Parabellum.2019.1080p.WEBRip.x264-RARBG.fr.vtt.shift'
+shiftSec = -20
 regex = re.compile(r'((?P<hours>\d+?)\:)?((?P<minutes>\d+?)\:)?((?P<seconds>\d+?)\.)?((?P<milliseconds>\d+))?.*$')
 
 def shift(source, target, seconds):

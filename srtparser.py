@@ -9,7 +9,7 @@ import shutil
 
 fileType = 'SRT'
 prelog = '[' + fileType + '] '
-defaultWatchPath = '/var/local/localsrt'
+defaultWatchPath = '/mnt/sb/mediapipe/srt'
 watchPattern = '/**/*.srt'
 logLevel = logging.DEBUG
 

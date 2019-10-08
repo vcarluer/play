@@ -9,8 +9,8 @@ from subliminal import download_best_subtitles, region, save_subtitles, scan_vid
 
 fileType = 'MP4'
 prelog = '[' + fileType + '] '
-watchPath = '/var/local/localms'
-srtPath = '/var/local/localsrt'
+watchPath = '/mnt/sb/mediapipe/ms'
+srtPath = '/mnt/sb/mediapipe/srt'
 remotePath = '/mnt/ms'
 pattern = '/**/*.mp4'
 patternPath = watchPath + pattern
